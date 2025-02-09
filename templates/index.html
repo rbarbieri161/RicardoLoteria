@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados das Loterias</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .ad-space {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+            min-height: 100px;
+            border: 1px dashed #ccc;
+        }
+        .lottery-card {
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .numbers-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #198754;
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin: 3px;
+            font-weight: bold;
+        }
+        .premio-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container py-4">
+        <!-- AdSense Topo -->
+        <div class="ad-space">
+            <!-- Código AdSense aqui -->
+            <div>Espaço para Anúncio 1</div>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Resultados das Loterias</h1>
+            <button onclick="atualizarResultados()" class="btn btn-primary">Atualizar</button>
+        </div>
+
+        <!-- AdSense Meio -->
+        <div class="ad-space">
+            <!-- Código AdSense aqui -->
+            <div>Espaço para Anúncio 2</div>
+        </div>
+
+        {% for lottery_id, data in results.items() %}
+        <div class="card lottery-card">
+            <div class="card-header bg-success text-white">
+                <h3 class="mb-0">{{ lottery_id|title }} - Concurso {{ data.numero }}</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Data: {{ data.dataApuracao }}</h5>
+                        <div class="d-flex flex-wrap my-3">
+                            {% for dezena in data.listaDezenas %}
+                            <div class="numbers-circle">{{ dezena }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="premio-info">
+                            <h5>Premiações</h5>
+                            {% for premio in data.listaRateioPremio %}
+                            <div class="mb-2">
+                                <strong>{{ premio.descricaoFaixa }}:</strong>
+                                {{ premio.numeroDeGanhadores }} ganhadores
+                                {% if premio.valorPremio > 0 %}
+                                - R$ {{ "%.2f"|format(premio.valorPremio) }}
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+
+                            {% if data.acumulado %}
+                            <div class="alert alert-warning">ACUMULOU!</div>
+                            {% endif %}
+
+                            <div class="mt-3">
+                                <strong>Próximo Concurso:</strong> {{ data.dataProximoConcurso }}<br>
+                                <strong>Prêmio Estimado:</strong> 
+                                R$ {{ "%.2f"|format(data.valorEstimadoProximoConcurso) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- AdSense Rodapé -->
+        <div class="ad-space">
+            <!-- Código AdSense aqui -->
+            <div>Espaço para Anúncio 3</div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function atualizarResultados() {
+            fetch('/atualizar')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Erro ao atualizar: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    alert('Erro ao atualizar resultados');
+                });
+        }
+    </script>
+</body>
+</html>
